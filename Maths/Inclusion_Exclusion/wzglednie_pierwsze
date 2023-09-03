@@ -1,0 +1,111 @@
+#include <bits/stdc++.h>
+#pragma GCC optimize("fast")
+using namespace std;
+#define endl '\n'
+int maxi=0;
+vector<int> tab;
+vector<bool> nasze;
+vector<int> pierwsza;
+vector<int> wyn;
+ vector<int> ilosc;
+vector<bool> help;
+vector<vector<int> > D(1);
+void dziel(int liczba, int x){
+    for(int i=0 ; i<(int)pierwsza.size(); i++){
+        if(help[liczba]==false && liczba!=1){
+            D[x].push_back(liczba);
+            break;
+        }
+        if(liczba/2<pierwsza[i]){
+        	//cerr<<"XD"<<liczba<<endl;
+            if(liczba!=1)D[x].push_back(liczba);
+            break;
+        }
+           if(liczba%pierwsza[i]==0){
+               D[x].push_back(pierwsza[i]);
+               while(liczba%pierwsza[i]==0){
+                liczba=liczba/pierwsza[i];
+            }
+        }
+    }
+}
+long long wynik=0;
+void kombi(int w , int y , int f){
+    int c=0;
+    int il=1;
+   for(int j=0 ; j<f; j++){
+    if(w&(1<<j)){
+        il=il*D[y][j];
+        c++;
+    }
+   }
+   //cout<<il<<" ";
+   if(c%2==0)wynik-=wyn[il]-1;
+   else wynik+=wyn[il]-1;
+   //cout<<"wynik: "<<wynik<<endl;
+}
+long long ans(int x){
+    int r=(int)D[x].size();
+   int pot=(int)pow(2 , r);
+    wynik=0;
+   for(int i=1 ; i<=pot-1 ; i++){
+        kombi(i, x, r);
+        //cout<<wynik<<" ";
+   }
+   //cout<<endl;
+   return wynik;
+}
+int main(){
+	ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    int n, a;
+    cin>>n;
+    int jeden=0;
+    for(int i=0 ; i<n ; i++){
+        cin>>a;
+        tab.push_back(a);
+        if(a==1)jeden++;
+        maxi=max(a , maxi);
+    }
+    for(int i=0 ; i<=maxi; i++){
+    	nasze.push_back(false);
+    	wyn.push_back(0);
+    	ilosc.push_back(0);
+    	help.push_back(false);
+    }
+    for(int i=0 ; i<n ; i++){
+    	nasze[tab[i]]=true;
+    	ilosc[tab[i]]++;
+    	if(tab[i]>maxi/2)wyn[tab[i]]++;
+    }
+   // for(int i=0 ; i<=maxi ; i++)cout<<help[i];
+    for(int p=2 ; p<=sqrt(maxi) ; p++){
+        for(int l=2*p ; l<=maxi ; l=l+p){
+            help[l]=true;
+            //cout<<"l: "<<l<<" ";
+        }
+    }
+    for(int i=2 ; i<=maxi ; i++)if(help[i]==false)pierwsza.push_back(i);
+   // for(int i=0 ; i<pierwsza.size() ; i++)cout<<pierwsza[i]<<" ";
+    //cout<<endl;
+    for(int d=2 ; d<=maxi/2; d++){
+    	for(int i=d; i<=maxi ; i=i+d){
+    		if(nasze[i]==true)wyn[d]=wyn[d]+ilosc[i];
+    		//cout<<i<<" ";
+    	}
+    	//cout<<endl;
+    }
+    wyn[1]=n;
+    D.resize(n);
+        //for(int j=0 ; j<D[i].size(); j++)cout<<D[i][j]<<" ";
+       //cout<<endl;
+    
+    //for(int i=2; i<=maxi; i++)cout<<i<<": "<<wyn[i]<<endl;
+    for(int i=0 ; i<n ; i++){
+        //cout<<tab[i]<<endl;
+        dziel(tab[i], i);
+        if(tab[i]==1)cout<<0<<" ";
+        else cout<<ans(i)<<" ";
+    }
+
+}
